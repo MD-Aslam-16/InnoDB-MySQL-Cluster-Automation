@@ -1,0 +1,7 @@
+---
+# handlers file for vagrant_provision
+- name: Restart mysql
+  service:
+    name: mysql
+    state: restarted
+  listen: "restart mysql"

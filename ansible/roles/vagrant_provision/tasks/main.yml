@@ -1,0 +1,13 @@
+---
+# tasks file for vagrant_provision
+- name: Include Installation Process
+  include_tasks: tasks/change_hostname.yml
+
+- name: Change Hostname
+  include_tasks: tasks/create_swap.yml
+
+- name: Update and Upgrade
+  include_tasks: tasks/update_upgrade.yml
+
+- name: Install and configure mysql-server and mysql-router
+  include_tasks: tasks/install_mysql.yml

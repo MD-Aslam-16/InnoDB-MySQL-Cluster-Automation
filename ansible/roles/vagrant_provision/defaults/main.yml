@@ -1,0 +1,5 @@
+---
+# defaults file for vagrant_provision
+swap_vars:
+  size: 2G
+  swappiness: 60

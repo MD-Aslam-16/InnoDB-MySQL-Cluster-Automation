@@ -1,0 +1,43 @@
+---
+- name: Installing MySQL Server, Router and Dependencies
+  package:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+    - mysql-server
+    - mysql-router
+    - python3-pymysql
+  become: true
+
+- name: Installing MySQL Shell
+  apt:
+    deb: https://cdn.mysql.com//Downloads/MySQL-Shell/mysql-shell_8.4.1-1ubuntu22.04_amd64.deb
+
+- name: start and enable mysql service
+  service:
+    name: mysql
+    state: started
+    enabled: yes
+
+- name: Create password for root@localhost and Create user and password for root@%
+  community.mysql.mysql_query:
+    login_user: "{{ db.user }}"
+    login_password: ""
+    login_unix_socket: /run/mysqld/mysqld.sock
+    query:
+      - "ALTER USER '{{ db.user }}'@'localhost' IDENTIFIED WITH caching_sha2_password BY '{{ db.pass }}';"
+      - "CREATE USER '{{ db.user }}'@'%' IDENTIFIED WITH caching_sha2_password BY '{{ db.pass }}';"
+      - "GRANT ALL PRIVILEGES ON *.* TO '{{ db.user }}'@'%';"
+      - "FLUSH PRIVILEGES;"
+  ignore_errors: true
+
+- name: Enable remote login to mysql
+  lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: "^bind-address"
+    line: "bind-address = 0.0.0.0"
+    backup: yes
+  notify:
+    - "restart mysql"
+    
