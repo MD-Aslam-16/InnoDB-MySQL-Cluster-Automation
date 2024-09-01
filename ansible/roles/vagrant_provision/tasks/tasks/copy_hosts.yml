@@ -1,10 +1,4 @@
 ---
-# - name: Remove old backup file
-#   file: 
-#     path: /etc/hosts.bkp
-#     state: absent
-#   ignore_errors: true
-
 - name: Copy "/etc/hosts" file to nodes
   ansible.builtin.copy:
     src: hosts
