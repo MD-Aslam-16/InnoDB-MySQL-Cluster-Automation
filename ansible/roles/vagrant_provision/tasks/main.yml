@@ -1,7 +1,6 @@
 ---
-tasks file for vagrant_provision
-- name: Include Installation Process
-  include_tasks: tasks/change_hostname.yml
+- name: Copy "/etc/hosts" file to node
+  include_tasks: tasks/copy_hosts.yml
 
 - name: Make swap and configure swappiness
   include_tasks: tasks/create_swap.yml

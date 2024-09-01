@@ -20,7 +20,7 @@
     state: started
     enabled: yes
 
-- name: Create password for root@localhost and Create user and password for root@%
+- name: Execute qurries for creating and altering user and privileges 
   community.mysql.mysql_query:
     login_user: "{{ db.user }}"
     login_password: ""
@@ -29,6 +29,20 @@
       - "ALTER USER '{{ db.user }}'@'localhost' IDENTIFIED WITH caching_sha2_password BY '{{ db.pass }}';"
       - "CREATE USER '{{ db.user }}'@'%' IDENTIFIED WITH caching_sha2_password BY '{{ db.pass }}';"
       - "GRANT ALL PRIVILEGES ON *.* TO '{{ db.user }}'@'%';"
+      - "FLUSH PRIVILEGES;"
+  ignore_errors: true
+
+- name: Execute qurries required for InnoDB Clustering
+  community.mysql.mysql_query:
+    login_user: "{{ db.user }}"
+    login_password: "{{ db.pass }}"
+    login_unix_socket: /run/mysqld/mysqld.sock
+    query:
+      - "GRANT CLONE_ADMIN, CONNECTION_ADMIN, CREATE USER, EXECUTE, FILE, GROUP_REPLICATION_ADMIN, PERSIST_RO_VARIABLES_ADMIN, PROCESS, RELOAD, REPLICATION CLIENT, REPLICATION SLAVE, REPLICATION_APPLIER, REPLICATION_SLAVE_ADMIN, ROLE_ADMIN, SELECT, SHUTDOWN, SYSTEM_VARIABLES_ADMIN ON *.* TO '{{ db.user }}'@'%' WITH GRANT OPTION;"
+      - "GRANT DELETE, INSERT, UPDATE ON mysql.* TO '{{ db.user }}'@'%' WITH GRANT OPTION;"
+      - "GRANT ALTER, ALTER ROUTINE, CREATE, CREATE ROUTINE, CREATE TEMPORARY TABLES, CREATE VIEW, DELETE, DROP, EVENT, EXECUTE, INDEX, INSERT, LOCK TABLES, REFERENCES, SHOW VIEW, TRIGGER, UPDATE ON mysql_innodb_cluster_metadata.* TO '{{ db.user }}'@'%' WITH GRANT OPTION;"
+      - "GRANT ALTER, ALTER ROUTINE, CREATE, CREATE ROUTINE, CREATE TEMPORARY TABLES, CREATE VIEW, DELETE, DROP, EVENT, EXECUTE, INDEX, INSERT, LOCK TABLES, REFERENCES, SHOW VIEW, TRIGGER, UPDATE ON mysql_innodb_cluster_metadata_bkp.* TO '{{ db.user }}'@'%' WITH GRANT OPTION;"
+      - "GRANT ALTER, ALTER ROUTINE, CREATE, CREATE ROUTINE, CREATE TEMPORARY TABLES, CREATE VIEW, DELETE, DROP, EVENT, EXECUTE, INDEX, INSERT, LOCK TABLES, REFERENCES, SHOW VIEW, TRIGGER, UPDATE ON mysql_innodb_cluster_metadata_previous.* TO '{{ db.user }}'@'%' WITH GRANT OPTION;"
       - "FLUSH PRIVILEGES;"
   ignore_errors: true
 
